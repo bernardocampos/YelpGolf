@@ -6,7 +6,7 @@ const CourseSchema = new Schema({
     name: {
         type: String,
         required: [true, 'Name is required']
-        // minLength: 10
+        // minLength: 11
     },
     price: {
         type: Number,
