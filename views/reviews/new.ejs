@@ -1,0 +1,37 @@
+<% layout('/layouts/boilerplate') %>
+    <div class="row">
+        <h1 class="text-center"><%= course.name %> </h1>
+        <div class="col-6 offset-3">
+            <h3>New Review</h3>
+            <form action="/courses/<%= course._id %>/reviews" method="post" novalidate class='needs-validation'>
+                
+                <div class="mb-3">
+                    <label class="form-label" for="rating">Rating</label>
+                    <select name="review[rating]" class="form-select" aria-label="Default select example" id='rating' required>
+                        <option value="" selected>Choose your rating</option>
+                        <option value="1">1 - Worst</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5 - Best</option>
+                      </select>
+                    <div class="invalid-feedback">You must select a rating</div>
+                </div>
+                
+                
+
+                <div class="mb-3">
+                    <label class="form-label" for="body">Review</label>
+                    <textarea class="form-control" type="text" id="body" name="review[body]" cols="30"
+                        rows="5"></textarea>
+                </div>
+
+                <div class="mb-3"><button class="btn btn-success">Submit</button></div>
+
+            </form>
+
+            <a href="/courses/<%= course._id %> ">Cancel</a>
+        </div>
+    </div>
+
+    

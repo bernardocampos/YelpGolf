@@ -1,0 +1,45 @@
+<% layout('/layouts/boilerplate') %>
+    <div class="row">
+        <h1 class="text-center">New Campground</h1>
+        <div class="col-6 offset-3">
+            <h3>Add a course</h3>
+            <form action="/courses" method="post" novalidate class='needs-validation'>
+                <div class="mb-3">
+                    <label class="form-label" for="name">Name</label>
+                    <input class="form-control" type="text" id="name" name="course[name]" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="location">Location</label>
+                    <input class="form-control" type="text" id="location" name="course[location]" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="image">Image</label>
+                    <input class="form-control" type="text" id="image" name="course[image]">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="price">Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="price-label">$</span>
+                        <input class="form-control" type="number" step=".01" id="price" name="course[price]" aria-describedby="price-label"
+                            placeholder="0.00">
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" type="text" id="description" name="course[description]" cols="30"
+                        rows="5"></textarea>
+                </div>
+
+                <div class="mb-3"><button class="btn btn-success">Submit</button></div>
+
+            </form>
+
+            <a href="/courses">Back to all</a>
+        </div>
+    </div>
+
+    

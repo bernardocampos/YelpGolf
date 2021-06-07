@@ -1,0 +1,23 @@
+<% layout('/layouts/boilerplate') %> 
+    <a href="/courses/new">Add a course</a>
+
+    <h2>Here are all the courses</h2>
+    
+        <% for(let course of courses) {%>
+            <div class="card mb-3" mb-3>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="<%= course.image%> " alt="a photo taken at <%= course.name %>" class="img-fluid">
+                    </div>
+                    <div class="col-md-8">
+                        <h5 class="card-title"> <%= course.name %> </h5>
+                        <p class="card-text"><%= course.description %> </p>
+                        <p class="card-text">
+                            <small class="text-muted"><%= course.location %> </small>
+                        </p>
+                        <a href='courses/<%=course._id%>' class="btn btn-primary">View <%= course.name %> </a>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    

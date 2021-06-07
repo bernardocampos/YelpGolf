@@ -1,0 +1,60 @@
+<% layout('/layouts/boilerplate') %>
+
+    <div class="row">
+        <div class="col-6">
+            <div class="card mb-3">
+                <img class="card-img-top" src="<%= course.image %>" alt="a golf course">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <%= course.name %>
+                    </h5>
+                    <p class="card-text">
+                        <%= course.description %>
+                    </p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <%= course.location %>
+                    </li>
+                    <% if(course.price) { %>
+                        <li class="list-group-item">Price for 18 holes: $<%= course.price %>
+                        </li>
+                        <% } %>
+                            <!-- <li class="list-group-item"> Avaliação média: 4.97</li> -->
+
+                </ul>
+                <div class="card-body">
+                    <a href="/courses/<%= course._id %>/reviews/new" class="card-link btn btn-success">Review</a>
+                    <a href="/courses/<%= course._id %>/edit" class="card-link btn btn-warning">Edit</a>
+                    <form action="/courses/<%= course._id %>?_method=DELETE" method="post" class="d-inline"><button
+                            class="btn btn-danger">Delete</button></form>
+                    <a class="btn btn-primary" href="/courses">Back to all courses</a>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-6">
+            <div>
+                <h2>Reviews</h2>
+
+                <% for (let review of course.reviews) {%>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Rating: <%= review.rating %>
+                            </h5>
+
+                            <p class="card-text">
+                                Review: <%= review.body %>
+                            </p>
+
+                            <form action="/courses/<%= course._id %>/reviews/<%= review._id %>?_method=DELETE"
+                                method="POST">
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+    </div>
