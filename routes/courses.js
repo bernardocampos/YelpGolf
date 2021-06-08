@@ -29,8 +29,10 @@ router.get('/new', catchAsync(async (req, res, next) => {
 }));
 
 router.post('/', validateCourse, catchAsync(async (req, res, next) => {
+    
     const newCourse = new Course(req.body.course)
     await newCourse.save();
+    req.flash('success', 'New course was created successfully.');
     res.redirect(`/courses/${newCourse._id}`)
 }));
 
@@ -38,7 +40,9 @@ router.get('/:id', catchAsync(async (req, res, next) => {
     const { id } = req.params;
     const course = await Course.findById(id).populate('reviews');
     if (!course) {
-        throw next(new ExpressError('Course not found', 404));
+        req.flash('error', 'Cannot find that course.');
+        res.redirect('/courses');
+        // throw next(new ExpressError('Course not found', 404)); //this was the initial approach
     }
     res.render('courses/show', { course })
 }));
@@ -57,12 +61,14 @@ router.put('/:id', validateCourse, catchAsync(async (req, res, next) => {
     const course = await Course.findByIdAndUpdate(id,
         req.body.course, //what's the difference between this and {...req.body.course} ?
         { runValidators: true })
+    req.flash('success', 'Course updated successfully.');
     res.redirect(`/courses/${course._id}`)
 }));
 
 router.delete('/:id', catchAsync(async (req, res) => {
     const { id } = req.params;
     await Course.findByIdAndDelete(id);
+    req.flash('success', 'Course deleted successfully.');
     res.redirect(`/courses`)
 }));
 
