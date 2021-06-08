@@ -7,15 +7,18 @@ const methodOverride = require('method-override');
 const Course = require('./models/course');
 const Review = require('./models/review');
 const ejsMate = require('ejs-mate');
+const session = require('express-session');
 const ExpressError = require('./utilities/ExpressError')
 const catchAsync = require('./utilities/catchAsync')
 
-const { courseSchema, reviewSchema } = require('./schemas.js')
+const courses = require('./routes/courses');
+const reviews = require('./routes/reviews');
 
 mongoose.connect('mongodb://localhost:27017/yelp-golf', {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false
 })
 
 const db = mongoose.connection;
@@ -32,128 +35,23 @@ app.set('views', path.join(__dirname, '/views'))
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'))
 
+app.use('/courses', courses)
+app.use('/courses/:id/reviews', reviews)
+app.use(express.static(path.join(__dirname, 'public')))
 
-const validateCourse = (req, res, next) => {
-
-    const { error } = courseSchema.validate(req.body)
-    console.log(error);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
+const sessionConfig = {
+    secret: 'esdrft7678u990jionjbnkokp[oi6r76]',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + (1000 * 60 * 60 * 24 * 7)
     }
 }
-
-const validateReview = (req, res, next) => {
-
-    const { error } = reviewSchema.validate(req.body)
-    console.log(error);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    } else {
-        next();
-    }
-}
+app.use(session(sessionConfig))
 
 app.get('/', (req, res) => {
     res.render('home.ejs');
 })
-
-app.get('/courses', catchAsync(async (req, res, next) => {
-
-    const courses = await Course.find({});
-    res.render('courses/index', { courses })
-
-
-}));
-
-app.get('/courses/new', catchAsync(async (req, res, next) => {
-
-    res.render('courses/new')
-
-}));
-
-app.post('/courses', validateCourse, catchAsync(async (req, res, next) => {
-
-
-    const newCourse = new Course(req.body.course)
-    await newCourse.save();
-    res.redirect(`/courses/${newCourse._id}`)
-
-
-}));
-
-app.get('/courses/:id', catchAsync(async (req, res, next) => {
-
-    const { id } = req.params;
-    const course = await Course.findById(id).populate('reviews');
-    if (!course) {
-        throw next(new ExpressError('Course not found', 404));
-    }
-    res.render('courses/show', { course })
-}));
-
-app.get('/courses/:id/edit', catchAsync(async (req, res, next) => {
-
-    const { id } = req.params;
-    const course = await Course.findById(id);
-    if (!course) {
-        throw next(new ExpressError('Unable to edit. Course not found', 404));
-    }
-    res.render('courses/edit', { course })
-
-
-}));
-
-app.put('/courses/:id', validateCourse, catchAsync(async (req, res, next) => {
-
-    const { id } = req.params;
-
-    const course = await Course.findByIdAndUpdate(id,
-        req.body.course, //what's the difference between this and {...req.body.course} ?
-        { runValidators: true })
-
-    res.redirect(`/courses/${course._id}`)
-
-}));
-
-app.delete('/courses/:id', catchAsync(async (req, res) => {
-
-    const { id } = req.params;
-    await Course.findByIdAndDelete(id);
-    res.redirect(`/courses`)
-
-}));
-
-app.get('/courses/:id/reviews/new', catchAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const course = await Course.findById(id);
-    res.render('reviews/new', { course })
-}));
-
-app.post('/courses/:id/reviews', validateReview, catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const review = new Review(req.body.review);
-    const course = await Course.findById(id).populate('reviews');
-    if (!course) {
-        throw next(new ExpressError('Course not found', 404));
-    }
-    course.reviews.push(review);
-    await course.save();
-    await review.save();
-
-    res.redirect(`/courses/${course._id}`)
-}));
-
-app.delete('/courses/:id/reviews/:reviewId', catchAsync(async (req, res, next) => {
-    const { id, reviewId } = req.params;
-    await Course.findByIdAndUpdate(id, { $pull: { reviews: reviewId } })
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/courses/${id}`)
-
-}));
 
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page not found.', 404))
